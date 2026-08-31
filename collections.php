@@ -23,6 +23,28 @@ define( 'COLLECTIONS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'COLLECTIONS_URL', plugin_dir_url( __FILE__ ) );
 
 /**
+ * Self-update from the private GitHub repo (killuakiller/collections-plugin).
+ *
+ * COLLECTIONS_GH_TOKEN is a read-only, repo-scoped GitHub fine-grained token,
+ * defined in wp-config.php. Without it, this site just won't see update
+ * notices (repo is private) but nothing else breaks.
+ */
+if ( is_admin() ) {
+	require_once COLLECTIONS_PATH . 'includes/plugin-update-checker/plugin-update-checker.php';
+
+	$collectionsUpdateChecker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/killuakiller/collections-plugin/',
+		__FILE__,
+		'collections-plugin'
+	);
+	$collectionsUpdateChecker->setBranch( 'main' );
+
+	if ( defined( 'COLLECTIONS_GH_TOKEN' ) && COLLECTIONS_GH_TOKEN ) {
+		$collectionsUpdateChecker->setAuthentication( COLLECTIONS_GH_TOKEN );
+	}
+}
+
+/**
  * Declare compatibility with WooCommerce features (e.g., HPOS).
  */
 add_action( 'before_woocommerce_init', function() {
